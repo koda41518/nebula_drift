@@ -63,7 +63,7 @@ class GameManager:
                 self.repairs.remove(repair)
 
         # Nettoyage des lasers expirés
-        self.lasers = [l for l in self.lasers if not l.expired()]
+        self.lasers = [l for l in self.lasers if not l.is_expired()]
 
         # MAJ du flash
         self.flash.update(dt)  #   mise à jour du timer

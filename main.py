@@ -8,10 +8,10 @@ from entities_classes.camera import Camera
 from entities_classes.background import StarField
 from entities_classes.screen_effects import DamageFlash
 
-from ui.hud import draw_hud
-from ui.pause_screen import draw_pause_screen
-from ui.gameover_screen import draw_gameover_screen
-from ui.minimap import draw_minimap
+from ui.hud import HUD
+from ui.pause_screen import PauseScreen
+from ui.gameover_screen import GameOverScreen
+from ui.minimap import MiniMapUI
 
 import settings
 
@@ -29,9 +29,15 @@ def main():
     background = StarField()                  # Étoiles
     flash = DamageFlash()                      # Flash rouge lors des dégâts
     manager = GameManager()                    # Gère ennemis, réparations, tirs, etc.
+    minimap = MiniMapUI()
+    hud = HUD(pygame.font.SysFont("Arial", 24))
+    pause_screen = PauseScreen(settings.WIDTH, settings.HEIGHT, hud.font)
+    gameover_screen = GameOverScreen(settings.WIDTH, settings.HEIGHT, hud.font)
 
     paused = False
     running = True
+    high_score = 0
+    button_rect = None
 
     # === Boucle principale ===
     while running:
@@ -48,44 +54,55 @@ def main():
                 elif event.key == pygame.K_SPACE and not paused and not manager.game_over:
                     manager.fire_laser(ship.pos, ship.forward())  # Tir laser
 
-        # === Mise à jour logique (si pas en pause ni game over) ===
+            if manager.game_over and button_rect:
+                action = gameover_screen.handle_event(event, button_rect)
+                if action == "replay":
+                    manager.reset()
+                    ship.reset((0, 0))
+                    paused = False
+
+        # === Mise à jour logique ===
         if not paused and not manager.game_over:
             keys = pygame.key.get_pressed()
             ship.update(keys)
-            camera.update(ship.pos)
+            camera.update(ship.pos, lerp_factor=0.15)
             manager.update(ship, dt)
             flash.update(dt)
 
         # === Rendu visuel ===
         screen.fill(settings.BACKGROUND_COLOR)
-        background.draw(screen, camera.pos)
 
-        # Dessin des entités
+        # Offset de la caméra (à soustraire à toutes les positions)
+        offset = camera.get_offset((settings.WIDTH, settings.HEIGHT))
+
+        background.draw(screen, camera.pos, (settings.WIDTH, settings.HEIGHT))
+
+        # Dessin des entités avec offset
         for laser in manager.lasers:
-            laser.draw(screen, camera.pos)
+            laser.draw(screen, offset)
         for enemy in manager.enemies:
-            enemy.draw(screen, camera.pos)
+            enemy.draw(screen, offset)
         for repair in manager.repairs:
-            repair.draw(screen, camera.pos)
+            repair.draw(screen, offset)
 
-        # Vaisseau + effets visuels
-        ship.draw(screen, camera.pos)
+        ship.draw(screen, offset)
         flash.draw(screen)
 
         # === UI ===
-        draw_minimap(screen, ship, manager.enemies, camera)
-        draw_hud(screen, ship.speed, ship.health, manager.score)
+        minimap.draw(screen, ship.pos, manager.enemies, manager.repairs)
+        hud.draw(screen, ship.speed, ship.health, manager.score)
 
         # Écrans spéciaux
         if paused:
-            draw_pause_screen(screen)
+            pause_screen.draw(screen)
         elif manager.game_over:
-            draw_gameover_screen(screen, manager.score)
+            if manager.score > high_score:
+                high_score = manager.score
+            button_rect = gameover_screen.draw(screen, manager.score, high_score)
 
-        # Actualise l'écran
+        # Actualise l’écran
         pygame.display.flip()
 
-    # === Fermeture propre ===
     pygame.quit()
     sys.exit()
 

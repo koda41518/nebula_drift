@@ -21,3 +21,6 @@ class Laser:
         # Calcul de la position à l’écran
         screen_pos = self.pos - offset
         pygame.draw.line(surface, (255, 80, 80), screen_pos, screen_pos + self.direction * 20, 3)
+    def collides_with(self, enemy):
+        # Collision simple: si le laser est assez proche de l'ennemi
+        return self.pos.distance_to(enemy.pos) < 20    

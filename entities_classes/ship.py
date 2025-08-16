@@ -22,9 +22,9 @@ class Ship:
 
     def update(self, keys):
         if keys[pygame.K_LEFT]:
-            self.angle += self.rotation_speed
-        if keys[pygame.K_RIGHT]:
             self.angle -= self.rotation_speed
+        if keys[pygame.K_RIGHT]:
+            self.angle += self.rotation_speed
         if keys[pygame.K_UP]:
             direction = self.forward()
             self.speed += direction * self.acceleration
@@ -40,3 +40,23 @@ class Ship:
         self.speed = pygame.Vector2(0, 0)
         self.health = self.max_health
         self.current_sprite = self.sprites["idle"]
+        
+    def take_damage(self, amount):
+        """
+        Réduit la santé du vaisseau.
+        """
+        self.health = max(0, self.health - amount)
+    def is_alive(self):
+        return self.health > 0
+    
+    def draw(self, screen, offset):
+        rotated_img = pygame.transform.rotate(self.current_sprite, -self.angle)
+        rect = rotated_img.get_rect(center=(self.pos - offset))
+        screen.blit(rotated_img, rect)
+    def forward(self):
+        """
+        Retourne un vecteur directionnel basé sur l'angle du vaisseau.
+        Ici, angle 0 = vers le haut.
+        """
+        angle_rad = math.radians(self.angle)
+        return pygame.Vector2(-math.sin(angle_rad), -math.cos(angle_rad))
