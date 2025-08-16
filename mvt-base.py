@@ -10,11 +10,7 @@ pygame.display.set_caption("Nebula Drift")  # Titre de la fenêtre
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 24)  # Police pour le texte
 
-# Chargement des sprites du vaisseau
-ship_idle_img = pygame.image.load("assets/vaisseau-1-arret.png").convert_alpha()
-ship_move_img = pygame.image.load("assets/vaisseau-1.png").convert_alpha()
-ship_thrust_img = pygame.image.load("assets/vaisseau-1-mvt.png").convert_alpha()
-ship_boost_img = pygame.image.load("assets/vaisseau-1-boost.png").convert_alpha()
+
 
 high_score = 0  # Meilleur score stocké en mémoire
 
