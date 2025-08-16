@@ -1,45 +1,76 @@
-import time
+import pygame
+import random
+import math
+from entities_classes.enemies import Enemy
+from entities_classes.repair import Repair
+from entities_classes.laser import Laser 
+from entities_classes.screen_effects import DamageFlash
+import settings
 
 class GameManager:
-    def __init__(self, ship, settings):
+    def __init__(self, ship, camera):
         self.ship = ship
-        self.settings = settings
+        self.camera = camera
+
+        self.enemies = []
+        self.lasers = []
+        self.repairs = []
+
+        self.spawn_timers = {
+            "enemy": 0.0,
+            "repair": 0.0,
+        }
+
         self.score = 0
         self.high_score = 0
-        self.kill_count = 0
-        self.last_enemy_spawn = time.time()
-        self.last_repair_spawn = time.time()
-        self.is_game_over = False
+        self.damage_flash = DamageFlash()
 
-    def update(self):
-        # Vérifie la vie du vaisseau
-        if self.ship.health <= 0:
-            self.is_game_over = True
-            self.update_high_score()
+    def update(self, dt):
+        self.spawn_timers["enemy"] -= dt
+        self.spawn_timers["repair"] -= dt
 
-    def update_high_score(self):
-        if self.score > self.high_score:
-            self.high_score = self.score
+        for enemy in self.enemies:
+            enemy.update(self.ship.pos, dt)
 
-    def add_kill(self):
-        self.kill_count += 1
-        self.score += 1
+        for laser in self.lasers:
+            laser.update(dt)
 
-    def should_spawn_enemy(self):
-        return time.time() - self.last_enemy_spawn >= self.settings["ENEMY_SPAWN_INTERVAL"]
+        self.damage_flash.update(dt)
 
-    def mark_enemy_spawned(self):
-        self.last_enemy_spawn = time.time()
+        self.handle_collisions()
+        self.cleanup_entities()
 
-    def should_spawn_repair(self):
-        return time.time() - self.last_repair_spawn >= self.settings["REPAIR_SPAWN_INTERVAL"]
+    def handle_collisions(self):
+        # Collision laser vs ennemi
+        for laser in self.lasers:
+            for enemy in self.enemies:
+                if laser.check_collision(enemy):  # suppose que laser a cette méthode
+                    self.enemies.remove(enemy)
+                    self.score += 1
+                    break
 
-    def mark_repair_spawned(self):
-        self.last_repair_spawn = time.time()
+        # Collision enemy vs ship
+        for enemy in self.enemies:
+            if enemy.check_collision_with_ship(self.ship):
+                self.enemies.remove(enemy)
+                self.damage_flash.trigger()
 
-    def reset(self):
-        self.score = 0
-        self.kill_count = 0
-        self.last_enemy_spawn = time.time()
-        self.last_repair_spawn = time.time()
-        self.is_game_over = False
+        # Collision repair vs ship
+        for repair in self.repairs:
+            if self.ship.check_pickup(repair):  # tu peux avoir une méthode ship.check_pickup
+                self.repairs.remove(repair)
+
+    def cleanup_entities(self):
+        self.lasers = [l for l in self.lasers if l.alive()]  # s’il y a un `alive()` ou un `lifetime` dans laser
+
+    def try_spawn_enemy(self):
+        if self.spawn_timers["enemy"] <= 0:
+            from entities_classes.enemies import Enemy
+            self.enemies.append(Enemy.spawn_near(self.ship.pos))
+            self.spawn_timers["enemy"] = 2.5
+
+    def try_spawn_repair(self):
+        if self.spawn_timers["repair"] <= 0:
+            from entities_classes.repair import Repair
+            self.repairs.append(Repair.spawn_near(self.ship.pos))
+            self.spawn_timers["repair"] = 8.0
