@@ -5,7 +5,7 @@ import sys
 from core.GameManager import GameManager
 from entities_classes.ship import Ship
 from entities_classes.camera import Camera
-from entities_classes.background import Background
+from entities_classes.background import StarField
 from entities_classes.screen_effects import DamageFlash
 
 from ui.hud import draw_hud
@@ -26,7 +26,7 @@ def main():
     # === Initialisation des objets ===
     ship = Ship((0, 0), settings.SHIP_SPRITES)  # Vaisseau du joueur
     camera = Camera(ship.pos)                  # Caméra qui suit le vaisseau
-    background = Background()                  # Étoiles
+    background = StarField()                  # Étoiles
     flash = DamageFlash()                      # Flash rouge lors des dégâts
     manager = GameManager()                    # Gère ennemis, réparations, tirs, etc.
 
