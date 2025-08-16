@@ -29,6 +29,8 @@ def main():
 
     paused = False
     game_over = False
+    running = True
+
     # etc.
 
     while running:
