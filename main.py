@@ -1,52 +1,74 @@
 import pygame
-import math
-import random
-
-from settings import WIDTH, HEIGHT, FPS, screen, clock, font, ship_idle_img, ship_move_img, ship_thrust_img, ship_boost_img
-from entities_classes import Ship, Enemy, Laser, Repair, Camera
-
+import sys
+from entities_classes.camera import Camera
+from entities_classes.background import Background
 from entities_classes.ship import Ship
-from entities_classes.enemies import Enemy
-from entities_classes.laser import Laser
-from entities_classes.repair import RepairPoint
-from ui.hud import HUD
-from ui.pause_screen import PauseScreen
-from ui.minimap import MiniMapUI
-from ui.gameover_screen import GameOverScreen
-# + settings, etc.
+from core.GameManager import GameManager
+from ui.hud import draw_hud
+from ui.pause_screen import draw_pause
+from ui.gameover_screen import draw_gameover
+from ui.minimap import draw_minimap  # si t'as fait une minimap
+import settings
 
-def main():
-    # Init du jeu
-    ship = Ship()
-    enemies = []
-    repairs = []
-    lasers = []
+pygame.init()
+pygame.font.init()
 
-    hud = HUD(font)
-    pause_screen = PauseScreen(WIDTH, HEIGHT, font)
-    minimap = MiniMapUI()
-    gameover = GameOverScreen(WIDTH, HEIGHT, font)
+screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+pygame.display.set_caption("Nebula Drift")
+clock = pygame.time.Clock()
 
-    paused = False
-    game_over = False
-    running = True
+# === Instances principales ===
+ship = Ship()
+camera = Camera(ship)
+bg = Background()
+game_manager = GameManager()
 
-    # etc.
+# === Variables d'état ===
+paused = False
+running = True
 
-    while running:
-        handle_events()
-        if paused:
-            pause_screen.draw(screen)
-            continue
-        
-        ship.update()
-        for enemy in enemies:
-            enemy.update(ship)
-            enemy.draw(screen)
-        for laser in lasers:
-            laser.update()
-            laser.check_collisions(enemies)
+# === Boucle de jeu ===
+while running:
+    dt = clock.tick(settings.FPS) / 1000
 
-        # etc.
-        hud.draw(...)
-        minimap.draw(...)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                paused = not paused
+
+            elif event.key == pygame.K_SPACE and not paused and not game_manager.game_over:
+                direction = ship.get_direction()
+                game_manager.fire_laser(ship.pos, direction)
+
+    if not paused and not game_manager.game_over:
+        ship.update(dt)
+        camera.update()
+        game_manager.update(ship, dt)
+
+    # === Affichage ===
+    screen.fill((0, 0, 0))
+    bg.draw(screen, camera.pos)
+    ship.draw(screen, camera.pos)
+
+    for enemy in game_manager.enemies:
+        enemy.draw(screen, camera.pos)
+    for repair in game_manager.repairs:
+        repair.draw(screen, camera.pos)
+    for laser in game_manager.lasers:
+        laser.draw(screen, camera.pos)
+
+    draw_hud(screen, ship, game_manager)
+
+    if paused:
+        draw_pause(screen)
+
+    if game_manager.game_over:
+        draw_gameover(screen, game_manager.score)
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
