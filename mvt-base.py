@@ -1,3 +1,6 @@
+
+#code compacte de
+
 import pygame
 import math
 import random
