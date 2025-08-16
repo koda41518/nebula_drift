@@ -1,13 +1,13 @@
 import pygame
 import random
 import math
+import time
+
 from entities_classes.enemies import Enemy
 from entities_classes.repair import Repair
 from entities_classes.laser import Laser 
-from entities_classes.screen_effects import DamageFlash
+from entities_classes.screen_effects import DamageFlash  #  
 import settings
-import time
-
 
 class GameManager:
     def __init__(self):
@@ -22,6 +22,8 @@ class GameManager:
 
         self.score = 0
         self.game_over = False
+
+        self.flash = DamageFlash()  #   gestion du flash
 
     def update(self, ship, dt):
         now = time.time()
@@ -40,6 +42,7 @@ class GameManager:
         for enemy in self.enemies[:]:
             enemy.update(ship.pos, dt)
             if enemy.check_collision_with_ship(ship):
+                self.flash.trigger()  #   flash déclenché en cas de collision
                 self.enemies.remove(enemy)
 
         # MAJ lasers + collision
@@ -62,6 +65,9 @@ class GameManager:
         # Nettoyage des lasers expirés
         self.lasers = [l for l in self.lasers if not l.expired()]
 
+        # MAJ du flash
+        self.flash.update(dt)  #   mise à jour du timer
+
         # Check game over
         if ship.health <= 0:
             self.game_over = True
@@ -74,6 +80,7 @@ class GameManager:
         self.game_over = False
         self.last_enemy_spawn = time.time()
         self.last_repair_spawn = time.time()
+        self.flash = DamageFlash()  #   réinitialise le flash
 
     def fire_laser(self, pos, direction):
         self.lasers.append(Laser(pos, direction))

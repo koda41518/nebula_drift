@@ -9,22 +9,33 @@ class GameOverScreen:
 
     def draw(self, screen, score, high_score):
         """
-        Dessine l'écran de fin de partie avec les scores et le bouton rejouer.
-        Retourne le rectangle du bouton pour gérer les événements.
+        Affiche l'écran de game over, les scores, et le bouton.
+        Retourne le rect du bouton pour gérer les événements.
         """
         button_rect = pygame.Rect(self.width // 2 - 100, self.height // 2 + 80, 200, 50)
 
         screen.fill(self.bg_color)
+
+        # Textes
         screen.blit(self.font.render("GAME OVER", True, (255, 0, 0)), (self.width // 2 - 100, self.height // 2 - 80))
         screen.blit(self.font.render(f"Score : {score} ennemis détruits", True, (255, 255, 255)), (self.width // 2 - 140, self.height // 2 - 20))
         screen.blit(self.font.render(f"Meilleur score : {high_score}", True, (200, 200, 255)), (self.width // 2 - 140, self.height // 2 + 20))
         screen.blit(self.font.render("Clique sur 'Rejouer' ou ferme la fenêtre", True, (180, 180, 180)), (self.width // 2 - 180, self.height // 2 + 50))
 
-        pygame.draw.rect(screen, (255, 255, 255), button_rect)
-        screen.blit(self.font.render("Rejouer", True, (0, 0, 0)), (button_rect.x + 50, button_rect.y + 10))
+        # 🎨 Bouton avec effet hover
+        if button_rect.collidepoint(pygame.mouse.get_pos()):
+            color = (200, 200, 200)  # survol
+        else:
+            color = (255, 255, 255)
+
+        pygame.draw.rect(screen, color, button_rect)
+
+        # Centrer le texte dans le bouton
+        text_surface = self.font.render("Rejouer", True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=button_rect.center)
+        screen.blit(text_surface, text_rect)
 
         return button_rect
-
     def handle_event(self, event, button_rect):
         """
         Gère les événements utilisateur sur l'écran de fin de jeu.
