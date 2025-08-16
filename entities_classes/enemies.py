@@ -7,6 +7,7 @@ class Enemy:
         self.pos = pygame.Vector2(pos)
         self.speed = speed
         self.damage = damage
+        self.alive = True  #  pour usage éventuel futur (particules, effets de mort, etc.)
 
     def update(self, target_pos, dt):
         direction = (target_pos - self.pos).normalize()
@@ -21,6 +22,10 @@ class Enemy:
             ship.take_damage(self.damage)
             return True
         return False
+
+    def destroy(self):
+        self.alive = False  # placeholder pour effets visuels/sonores si tu veux
+        # (éventuellement animation ou particules ici)
 
     @staticmethod
     def spawn_near(center_pos, min_dist=800, max_dist=1200):

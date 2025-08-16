@@ -24,6 +24,8 @@ LASER_DAMAGE_RADIUS = 20
 # Ennemis
 ENEMY_DAMAGE = 25
 ENEMY_SPEED = 1.2
+ENEMY_SPAWN_INTERVAL = 2  # secondes
+
 
 # Réparations
 REPAIR_HEAL = 20
@@ -32,6 +34,11 @@ REPAIR_COOLDOWN = 5  # secondes
 # Mini-carte
 MINIMAP_SIZE = 200
 MINIMAP_SCALE = 0.05
+
+#Etoiles
+STAR_COUNT = 1000  # nombre d’étoiles
+
+DAMAGE_FLASH_DURATION = 0.3  # secondes
 
 # Autres
 FPS = 60
