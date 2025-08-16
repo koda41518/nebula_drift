@@ -12,6 +12,7 @@ class Ship:
 
         self.health = 100
         self.max_health = 100
+        self.has_shield = False  # bouclier desactivé
 
         # 🔁 Chargement des sprites (statiques)
         self.sprites = {
@@ -77,7 +78,11 @@ class Ship:
         """
         Réduit la santé du vaisseau.
         """
-        self.health = max(0, self.health - amount)
+        if self.has_shield:
+            self.has_shield = False  # Le bouclier bloque une seule fois
+            # ( un son ou une animation ici)
+        else:
+            self.health = max(0, self.health - amount)
     
     def heal(self, amount):
         """Soigne le vaisseau d’un certain montant, sans dépasser la vie max."""
