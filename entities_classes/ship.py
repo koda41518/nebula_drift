@@ -32,7 +32,10 @@ class Ship:
                 pygame.image.load(sprites["boost"]).convert_alpha(), (128, 128)
             )
         ]
-
+        #sprite du bouclier 
+        self.shield_image = pygame.transform.scale(
+            pygame.image.load(sprites["shield"]).convert_alpha(), (140, 140)
+        )
         # Animation setup
         self.boost_index = 0
         self.boost_timer = 0
@@ -86,9 +89,18 @@ class Ship:
     
 
     def draw(self, screen, offset):
+        center = self.pos - offset
+
+        # 🔁 Dessiner le vaisseau
         rotated_img = pygame.transform.rotate(self.current_sprite, -self.angle)
-        rect = rotated_img.get_rect(center=(self.pos - offset))
+        rect = rotated_img.get_rect(center=center)
         screen.blit(rotated_img, rect)
+
+        # 🛡️ Dessiner le bouclier par-dessus
+        rotated_shield = pygame.transform.rotate(self.shield_image, -self.angle)
+        shield_rect = rotated_shield.get_rect(center=center)
+        rotated_shield.set_alpha(150)  # Optionnel : rend le bouclier semi-transparent
+        screen.blit(rotated_shield, shield_rect)
     def forward(self):
         """
         Retourne un vecteur directionnel basé sur l'angle du vaisseau.

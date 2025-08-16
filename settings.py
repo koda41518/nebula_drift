@@ -47,4 +47,5 @@ SHIP_SPRITES = {
     "move": "assets/ship-sprit/vaisseau-1.png",
     "thrust": "assets/ship-sprit/vaisseau-1-mvt.png",
     "boost": "assets/ship-sprit/vaisseau-1-boost.png",
+    "shield": "assets/ship-sprit/bouclier.png" 
 }
