@@ -13,7 +13,7 @@ class Ship:
         self.health = 100
         self.max_health = 100
 
-        # 🔁 On charge les sprites UNE FOIS ici
+        # 🔁 Chargement des sprites (statiques)
         self.sprites = {
             "idle": pygame.transform.scale(
                 pygame.image.load(sprites["idle"]).convert_alpha(), (128, 128)
@@ -22,6 +22,23 @@ class Ship:
                 pygame.image.load(sprites["move"]).convert_alpha(), (128, 128)
             )
         }
+
+        # 🔁 Chargement des frames d'animation (thrust / boost)
+        self.boost_frames = [
+            pygame.transform.scale(
+                pygame.image.load(sprites["thrust"]).convert_alpha(), (128, 128)
+            ),
+            pygame.transform.scale(
+                pygame.image.load(sprites["boost"]).convert_alpha(), (128, 128)
+            )
+        ]
+
+        # Animation setup
+        self.boost_index = 0
+        self.boost_timer = 0
+        self.boost_speed = 0.1  # secondes entre deux frames
+
+        # Sprite affiché actuellement
         self.current_sprite = self.sprites["idle"]
 
     def update(self, keys):
@@ -32,7 +49,15 @@ class Ship:
         if keys[pygame.K_UP]:
             direction = self.forward()
             self.speed += direction * self.acceleration
-            self.current_sprite = self.sprites["move"]
+
+            # 🎞️ Animation boost
+            self.boost_timer += 1 / 60  # ou dt si tu veux passer le temps réel
+            if self.boost_timer >= self.boost_speed:
+                self.boost_index = (self.boost_index + 1) % len(self.boost_frames)
+                self.boost_timer = 0
+
+            self.current_sprite = self.boost_frames[self.boost_index]
+
         else:
             self.current_sprite = self.sprites["idle"]
 
@@ -54,7 +79,7 @@ class Ship:
     def heal(self, amount):
         """Soigne le vaisseau d’un certain montant, sans dépasser la vie max."""
         self.health = min(self.max_health, self.health + amount)
-        
+
     def is_alive(self):
         return self.health > 0
     
