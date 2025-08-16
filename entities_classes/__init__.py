@@ -4,7 +4,7 @@ from .laser import Laser
 from .enemies import Enemy
 from .repair import Repair
 from .camera import Camera
-from entities_classes import StarField
+from .background import StarField
 from .screen_effects import ScreenEffects
 
 

@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-# 📦 Import des modules du projet
+#  Import des modules du projet
 from core.GameManager import GameManager
 from entities_classes.ship import Ship
 from entities_classes.camera import Camera
