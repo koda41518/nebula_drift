@@ -24,7 +24,7 @@ def main():
     clock = pygame.time.Clock()
 
     # === Initialisation des objets ===
-    ship = Ship((0, 0), settings.SHIP_SPRITES)  # Vaisseau du joueur
+    ship = Ship((0, 0), settings.SHIP_SPRITES)  # Vaisseau 
     camera = Camera(ship.pos)                  # Caméra qui suit le vaisseau
     background = StarField()                  # Étoiles
     flash = DamageFlash()                      # Flash rouge lors des dégâts
@@ -86,7 +86,7 @@ def main():
             repair.draw(screen, offset)
 
         ship.draw(screen, offset)
-        flash.draw(screen)
+        manager.flash.draw(screen)
 
         # === UI ===
         minimap.draw(screen, ship.pos, manager.enemies, manager.repairs)

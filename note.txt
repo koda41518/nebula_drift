@@ -1,0 +1,5 @@
+
+j ai fait les sprite sur ce site 
+# https://www.pixilart.com/draw
+
+mvt-base.py c est le code compacte simple 

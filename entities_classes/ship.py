@@ -15,8 +15,12 @@ class Ship:
 
         # 🔁 On charge les sprites UNE FOIS ici
         self.sprites = {
-            "idle": pygame.image.load(sprites["idle"]).convert_alpha(),
-            "move": pygame.image.load(sprites["move"]).convert_alpha()
+            "idle": pygame.transform.scale(
+                pygame.image.load(sprites["idle"]).convert_alpha(), (128, 128)
+            ),
+            "move": pygame.transform.scale(
+                pygame.image.load(sprites["move"]).convert_alpha(), (128, 128)
+            )
         }
         self.current_sprite = self.sprites["idle"]
 
@@ -46,9 +50,16 @@ class Ship:
         Réduit la santé du vaisseau.
         """
         self.health = max(0, self.health - amount)
+    
+    def heal(self, amount):
+        """Soigne le vaisseau d’un certain montant, sans dépasser la vie max."""
+        self.health = min(self.max_health, self.health + amount)
+        
     def is_alive(self):
         return self.health > 0
     
+    
+
     def draw(self, screen, offset):
         rotated_img = pygame.transform.rotate(self.current_sprite, -self.angle)
         rect = rotated_img.get_rect(center=(self.pos - offset))
@@ -59,4 +70,4 @@ class Ship:
         Ici, angle 0 = vers le haut.
         """
         angle_rad = math.radians(self.angle)
-        return pygame.Vector2(-math.sin(angle_rad), -math.cos(angle_rad))
+        return pygame.Vector2(math.sin(angle_rad), -math.cos(angle_rad))

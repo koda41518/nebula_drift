@@ -59,7 +59,7 @@ class GameManager:
         # MAJ réparateurs
         for repair in self.repairs[:]:
             if ship.pos.distance_to(repair.pos) < 30:
-                ship.heal()
+                ship.heal(25)
                 self.repairs.remove(repair)
 
         # Nettoyage des lasers expirés

@@ -23,7 +23,7 @@ def main():
 
     # Variables du joueur (vaisseau)
     ship_pos = pygame.Vector2(0, 0)
-    ship_angle = 0
+    ship_angle = 90
     ship_speed = pygame.Vector2(0, 0)
     acceleration = 0.15
     rotation_speed = 3
