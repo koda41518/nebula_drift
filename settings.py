@@ -51,5 +51,6 @@ SHIP_SPRITES = {
     "shield": "assets/ship-sprit/bouclier.png" 
 }
 ITEM_SPRITES = {
-    "shield_pickup": "assets/ship-sprit/shield-pickup.png"
+    "shield_pickup": "assets/shield-sprit/shield-pickup.png",
+    "repair": "assets/repair-sprit/donut.png"
 }
