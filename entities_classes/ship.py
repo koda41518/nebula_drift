@@ -13,6 +13,7 @@ class Ship:
         self.health = 100
         self.max_health = 100
         self.has_shield = False  # bouclier desactivé
+        self.invincible_timer = 0
 
         # 🔁 Chargement des sprites (statiques)
         self.sprites = {
@@ -44,7 +45,13 @@ class Ship:
 
         # Sprite affiché actuellement
         self.current_sprite = self.sprites["idle"]
-
+    def reset(self, pos):
+        self.pos = pygame.Vector2(pos)
+        self.angle = 0
+        self.speed = pygame.Vector2(0, 0)
+        self.current_sprite = self.sprites["idle"]
+        self.has_shield = False
+        self.invincible_timer = 0
     def update(self, keys):
         if keys[pygame.K_LEFT]:
             self.angle -= self.rotation_speed
@@ -67,22 +74,25 @@ class Ship:
 
         self.speed *= self.friction
         self.pos += self.speed 
-    def reset(self, pos):
-        self.pos = pygame.Vector2(pos)
-        self.angle = 0
-        self.speed = pygame.Vector2(0, 0)
-        self.health = self.max_health
-        self.current_sprite = self.sprites["idle"]
+        if self.invincible_timer > 0:
+            self.invincible_timer -= 1 / 60  # 
+        
+        
         
     def take_damage(self, amount):
-        """
-        Réduit la santé du vaisseau.
-        """
+        if self.invincible_timer > 0:
+            print("⏳ Invincible, aucun dégât.")
+            return
+
+        print("Has shield:", self.has_shield)
         if self.has_shield:
-            self.has_shield = False  # Le bouclier bloque une seule fois
-            # ( un son ou une animation ici)
+            print("💥 Bouclier absorbé !")
+            self.has_shield = False
         else:
+            print("❤️ Vie perdue !")
             self.health = max(0, self.health - amount)
+
+        self.invincible_timer = 1.0  # 1 seconde d’invincibilité
     
     def heal(self, amount):
         """Soigne le vaisseau d’un certain montant, sans dépasser la vie max."""
@@ -102,10 +112,11 @@ class Ship:
         screen.blit(rotated_img, rect)
 
         # 🛡️ Dessiner le bouclier par-dessus
-        rotated_shield = pygame.transform.rotate(self.shield_image, -self.angle)
-        shield_rect = rotated_shield.get_rect(center=center)
-        rotated_shield.set_alpha(150)  # Optionnel : rend le bouclier semi-transparent
-        screen.blit(rotated_shield, shield_rect)
+        if self.has_shield:
+            rotated_shield = pygame.transform.rotate(self.shield_image, -self.angle)
+            shield_rect = rotated_shield.get_rect(center=center)
+            rotated_shield.set_alpha(150)  # Optionnel : rend le bouclier semi-transparent
+            screen.blit(rotated_shield, shield_rect)
     def forward(self):
         """
         Retourne un vecteur directionnel basé sur l'angle du vaisseau.

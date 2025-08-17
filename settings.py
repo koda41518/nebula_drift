@@ -42,10 +42,14 @@ DAMAGE_FLASH_DURATION = 0.3  # secondes
 
 # Autres
 FPS = 60
+
 SHIP_SPRITES = {
     "idle": "assets/ship-sprit/vaisseau-1-arret.png",
     "move": "assets/ship-sprit/vaisseau-1.png",
     "thrust": "assets/ship-sprit/vaisseau-1-mvt.png",
     "boost": "assets/ship-sprit/vaisseau-1-boost.png",
     "shield": "assets/ship-sprit/bouclier.png" 
+}
+ITEM_SPRITES = {
+    "shield_pickup": "assets/ship-sprit/shield-pickup.png"
 }

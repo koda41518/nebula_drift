@@ -7,6 +7,7 @@ from entities_classes.enemies import Enemy
 from entities_classes.repair import Repair
 from entities_classes.laser import Laser 
 from entities_classes.screen_effects import DamageFlash  #  
+from entities_classes.shield_pickup import ShieldPickup
 import settings
 
 class GameManager:
@@ -14,9 +15,13 @@ class GameManager:
         self.enemies = []
         self.repairs = []
         self.lasers = []
+        self.shield_pickups = []
 
         self.last_enemy_spawn = time.time()
         self.last_repair_spawn = time.time()
+        self.last_shield_spawn = time.time()
+
+        self.shield_spawn_delay = 10 
         self.enemy_spawn_delay = 2.5
         self.repair_spawn_delay = 8
 
@@ -37,12 +42,25 @@ class GameManager:
         if now - self.last_repair_spawn > self.repair_spawn_delay:
             self.repairs.append(Repair.spawn_near(ship.pos))
             self.last_repair_spawn = now
+        
+        #Spawn de bouclier
+        if now - self.last_shield_spawn > self.shield_spawn_delay:
+            from entities_classes.shield_pickup import ShieldPickup
+            self.shield_pickups.append(ShieldPickup.spawn_near(ship.pos))
+            self.last_shield_spawn = now
 
+         # MAJ bouclier
+        for pickup in self.shield_pickups[:]:
+            if ship.pos.distance_to(pickup.pos) < 30:
+                ship.has_shield = True
+                self.shield_pickups.remove(pickup)
         # MAJ ennemis
         for enemy in self.enemies[:]:
             enemy.update(ship.pos, dt)
             if enemy.check_collision_with_ship(ship):
-                self.flash.trigger()  #   flash déclenché en cas de collision
+                # ✅ NE prend des dégâts que si pas invincible
+                self.flash.trigger()  # flash visuel
+                ship.take_damage(25)
                 self.enemies.remove(enemy)
 
         # MAJ lasers + collision
@@ -62,6 +80,8 @@ class GameManager:
                 ship.heal(25)
                 self.repairs.remove(repair)
 
+       
+
         # Nettoyage des lasers expirés
         self.lasers = [l for l in self.lasers if not l.is_expired()]
 
@@ -80,6 +100,7 @@ class GameManager:
         self.game_over = False
         self.last_enemy_spawn = time.time()
         self.last_repair_spawn = time.time()
+        self.last_shield_spawn = time.time() 
         self.flash = DamageFlash()  #   réinitialise le flash
 
     def fire_laser(self, pos, direction):

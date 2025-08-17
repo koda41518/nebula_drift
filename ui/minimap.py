@@ -6,7 +6,7 @@ class MiniMapUI:
         self.size = size
         self.scale = scale
 
-    def draw(self, screen, ship_pos, enemies, repairs):
+    def draw(self, screen, ship_pos, enemies, repairs , shields):
         """
         Dessine une mini-carte en bas à droite de l'écran :
         - Le joueur est au centre
@@ -36,5 +36,12 @@ class MiniMapUI:
             if 0 <= map_pos.x < self.size and 0 <= map_pos.y < self.size:
                 pygame.draw.circle(surface, (60, 255, 60), (int(map_pos.x), int(map_pos.y)), 3)
 
+        #bouclier
+        for shield in shields:
+            rel_pos = (shield.pos - ship_pos) * self.scale
+            map_pos = center + rel_pos
+            if 0 <= map_pos.x < self.size and 0 <= map_pos.y < self.size:
+                pygame.draw.circle(surface, (100, 200, 255), (int(map_pos.x), int(map_pos.y)), 3)
+            
         # Affichage en bas à droite
         screen.blit(surface, (screen.get_width() - self.size - 20, screen.get_height() - self.size - 20))

@@ -59,6 +59,7 @@ def main():
                 if action == "replay":
                     manager.reset()
                     ship.reset((0, 0))
+                    ship.has_shield = False 
                     paused = False
 
         # === Mise à jour logique ===
@@ -84,12 +85,16 @@ def main():
             enemy.draw(screen, offset)
         for repair in manager.repairs:
             repair.draw(screen, offset)
+        for shield in manager.shield_pickups:  
+            shield.draw(screen, offset)
 
         ship.draw(screen, offset)
+        if ship.has_shield:
+            shield.draw(screen, offset)# ici test
         manager.flash.draw(screen)
 
         # === UI ===
-        minimap.draw(screen, ship.pos, manager.enemies, manager.repairs)
+        minimap.draw(screen, ship.pos, manager.enemies, manager.repairs, manager.shield_pickups)
         hud.draw(screen, ship.speed, ship.health, manager.score)
 
         # Écrans spéciaux
