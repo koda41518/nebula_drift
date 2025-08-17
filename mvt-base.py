@@ -1,5 +1,5 @@
 
-#code compacte de
+#code compacte de pew pew pew
 
 import pygame
 import math
@@ -9,7 +9,7 @@ import random
 pygame.init()
 WIDTH, HEIGHT = 1300, 900  # Taille de la fenêtre
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Nebula Drift")  # Titre de la fenêtre
+pygame.display.set_caption("PEW PEW PEW")  # Titre de la fenêtre
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 24)  # Police pour le texte
 
