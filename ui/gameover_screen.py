@@ -14,21 +14,39 @@ class GameOverScreen:
         """
         button_rect = pygame.Rect(self.width // 2 - 100, self.height // 2 + 80, 200, 50)
 
-        screen.fill(self.bg_color)
+        overlay = pygame.Surface(screen.get_size())
+        overlay.fill((10, 10, 30))  # bleu nuit + propre
+        overlay.set_alpha(240)  # plus opaque
+        screen.blit(overlay, (0, 0))
 
         # Textes
-        screen.blit(self.font.render("GAME OVER", True, (255, 0, 0)), (self.width // 2 - 100, self.height // 2 - 80))
-        screen.blit(self.font.render(f"Score : {score} ennemis détruits", True, (255, 255, 255)), (self.width // 2 - 140, self.height // 2 - 20))
-        screen.blit(self.font.render(f"Meilleur score : {high_score}", True, (200, 200, 255)), (self.width // 2 - 140, self.height // 2 + 20))
-        screen.blit(self.font.render("Clique sur 'Rejouer' ou ferme la fenêtre", True, (180, 180, 180)), (self.width // 2 - 180, self.height // 2 + 50))
+        title = self.font.render("GAME OVER ", True, (255, 0, 0))
+        title_rect = title.get_rect(center=(self.width // 2, self.height // 2 - 80))
+        screen.blit(title, title_rect)
 
+        score_text = self.font.render(f"Score : {score} ennemis détruits", True, (255, 255, 255))
+        score_rect = score_text.get_rect(center=(self.width // 2, self.height // 2 - 20))
+        screen.blit(score_text, score_rect)
+
+        high_text = self.font.render(f"Meilleur score : {high_score}", True, (200, 200, 255))
+        high_rect = high_text.get_rect(center=(self.width // 2, self.height // 2 + 20))
+        screen.blit(high_text, high_rect)
+        if score == high_score and high_score > 0:
+            congrats = self.font.render("🏆 Nouveau record !", True, (255, 215, 0))
+            congrats_rect = congrats.get_rect(center=(self.width // 2, self.height // 2 + 60))
+            screen.blit(congrats, congrats_rect)
+
+        """info_text = self.font.render("Clique sur 'Rejouer' ou ferme la fenêtre", True, (180, 180, 180))
+        info_rect = info_text.get_rect(center=(self.width // 2, self.height // 2 + 100))
+        screen.blit(info_text, info_rect)
+"""
         # 🎨 Bouton avec effet hover
         if button_rect.collidepoint(pygame.mouse.get_pos()):
             color = (200, 200, 200)  # survol
         else:
             color = (255, 255, 255)
 
-        pygame.draw.rect(screen, color, button_rect)
+        pygame.draw.rect(screen, color, button_rect, border_radius=10)
 
         # Centrer le texte dans le bouton
         text_surface = self.font.render("Rejouer", True, (0, 0, 0))

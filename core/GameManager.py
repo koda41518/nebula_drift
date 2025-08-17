@@ -96,6 +96,7 @@ class GameManager:
         self.enemies.clear()
         self.repairs.clear()
         self.lasers.clear()
+        self.shield_pickups.clear()  
         self.score = 0
         self.game_over = False
         self.last_enemy_spawn = time.time()

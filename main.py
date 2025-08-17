@@ -26,7 +26,7 @@ def main():
     # === Initialisation des objets ===
     ship = Ship((0, 0), settings.SHIP_SPRITES)  # Vaisseau 
     camera = Camera(ship.pos)                  # Caméra qui suit le vaisseau
-    background = StarField()                  # Étoiles
+    background = StarField()                   # Étoiles
     flash = DamageFlash()                      # Flash rouge lors des dégâts
     manager = GameManager()                    # Gère ennemis, réparations, tirs, etc.
     minimap = MiniMapUI()
@@ -59,8 +59,10 @@ def main():
                 if action == "replay":
                     manager.reset()
                     ship.reset((0, 0))
+                    manager.game_over = False
                     ship.has_shield = False 
                     paused = False
+                    button_rect = False
 
         # === Mise à jour logique ===
         if not paused and not manager.game_over:
@@ -73,12 +75,11 @@ def main():
         # === Rendu visuel ===
         screen.fill(settings.BACKGROUND_COLOR)
 
-        # Offset de la caméra (à soustraire à toutes les positions)
         offset = camera.get_offset((settings.WIDTH, settings.HEIGHT))
 
         background.draw(screen, camera.pos, (settings.WIDTH, settings.HEIGHT))
 
-        # Dessin des entités avec offset
+        # Dessin des entités
         for laser in manager.lasers:
             laser.draw(screen, offset)
         for enemy in manager.enemies:
@@ -89,21 +90,21 @@ def main():
             shield.draw(screen, offset)
 
         ship.draw(screen, offset)
-        if ship.has_shield:
-            shield.draw(screen, offset)# ici test
         manager.flash.draw(screen)
 
         # === UI ===
         minimap.draw(screen, ship.pos, manager.enemies, manager.repairs, manager.shield_pickups)
         hud.draw(screen, ship.speed, ship.health, manager.score)
 
-        # Écrans spéciaux
         if paused:
             pause_screen.draw(screen)
-        elif manager.game_over:
+
+        if manager.game_over:
             if manager.score > high_score:
                 high_score = manager.score
             button_rect = gameover_screen.draw(screen, manager.score, high_score)
+        else:
+            button_rect = None
 
         # Actualise l’écran
         pygame.display.flip()
