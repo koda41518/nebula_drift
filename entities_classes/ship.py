@@ -15,7 +15,7 @@ class Ship:
         self.has_shield = False  # bouclier desactivé
         self.invincible_timer = 0
 
-        # 🔁 Chargement des sprites (statiques)
+        # 🔁 Chargement des sprites (statiques) 🤸‍♀️
         self.sprites = {
             "idle": pygame.transform.scale(
                 pygame.image.load(sprites["idle"]).convert_alpha(), (128, 128)
@@ -38,7 +38,7 @@ class Ship:
         self.shield_image = pygame.transform.scale(
             pygame.image.load(sprites["shield"]).convert_alpha(), (140, 140)
         )
-        # Animation setup
+        # Animation setup 🕺🏼
         self.boost_index = 0
         self.boost_timer = 0
         self.boost_speed = 0.1  # secondes entre deux frames
@@ -81,15 +81,15 @@ class Ship:
         
     def take_damage(self, amount):
         if self.invincible_timer > 0:
-            print("⏳ Invincible, aucun dégât.")
+            #print("⏳ Invincible, aucun dégât.")
             return
 
-        print("Has shield:", self.has_shield)
+        #print("Has shield:", self.has_shield)
         if self.has_shield:
-            print("💥 Bouclier absorbé !")
+            #print("💥 Bouclier absorbé !")
             self.has_shield = False
         else:
-            print("❤️ Vie perdue !")
+            #print("❤️🥀 Vie perdue !")
             self.health = max(0, self.health - amount)
 
         self.invincible_timer = 1.0  # 1 seconde d’invincibilité

@@ -10,6 +10,7 @@ class Repair:
         try:
             # Charge le sprite depuis settings
             self.image = pygame.image.load(settings.ITEM_SPRITES["repair"]).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (70, 70))
         except FileNotFoundError:
             # Si le sprite est introuvable, cercle vert par défaut
             self.image = pygame.Surface((40, 40), pygame.SRCALPHA)

@@ -10,6 +10,7 @@ class ShieldPickup:
         try:
             # On essaie de charger le sprite
             self.image = pygame.image.load(settings.ITEM_SPRITES["shield_pickup"]).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (70, 70))
         except FileNotFoundError:
             # Sinon on crée un cercle bleu
             self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
