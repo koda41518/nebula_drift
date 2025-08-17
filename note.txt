@@ -27,7 +27,10 @@ Fichiers principaux :
 Commande pour lancer le jeu :
 ────────────────────────────────
 
-    Avant de lancer le jeu, installe les dépendances dans un env  :
+    Avant de lancer le jeu, installe les dépendances ; 
+    dans un env " python3 -m venv env
+                  source env/bin/activate"
+                   
     pip install -r requirements.txt (numpy - Pygame)
 
 

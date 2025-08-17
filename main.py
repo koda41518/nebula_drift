@@ -1,39 +1,63 @@
 import pygame
 import sys
 
-#  Import des modules du projet
+# Imports du projet
 from core.GameManager import GameManager
 from entities_classes.ship import Ship
 from entities_classes.camera import Camera
 from entities_classes.background import StarField
 from entities_classes.screen_effects import DamageFlash
-
 from ui.hud import HUD
 from ui.pause_screen import PauseScreen
 from ui.gameover_screen import GameOverScreen
 from ui.minimap import MiniMapUI
-
+from ui.main_menu import MainMenu
 import settings
 
 
+def reset_game(ship, manager):
+    """Remet le jeu à zéro (vaisseau, score, ennemis, etc.)"""
+    manager.reset()
+    ship.reset((0, 0))
+    ship.has_shield = False
+
+
 def main():
-    # === Initialisation générale ===
     pygame.init()
     screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
     pygame.display.set_caption("Nebula Drift")
     clock = pygame.time.Clock()
 
-    # === Initialisation des objets ===
-    ship = Ship((0, 0), settings.SHIP_SPRITES)  # Vaisseau 
-    camera = Camera(ship.pos)                  # Caméra qui suit le vaisseau
-    background = StarField()                   # Étoiles
-    flash = DamageFlash()                      # Flash rouge lors des dégâts
-    manager = GameManager()                    # Gère ennemis, réparations, tirs, etc.
-    minimap = MiniMapUI()
+    # UI
     hud = HUD(pygame.font.SysFont("Arial", 24))
     pause_screen = PauseScreen(settings.WIDTH, settings.HEIGHT, hud.font)
     gameover_screen = GameOverScreen(settings.WIDTH, settings.HEIGHT, hud.font)
+    menu = MainMenu(settings.WIDTH, settings.HEIGHT, pygame.font.SysFont("Arial", 32))
 
+    # Affiche le menu principal
+    in_menu = True
+    while in_menu:
+        screen.fill((0, 0, 0))
+        button_rect = menu.draw(screen)
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            action = menu.handle_event(event, button_rect)
+            if action == "start":
+                in_menu = False
+            elif action == "quit":
+                pygame.quit()
+                sys.exit()
+
+    # === Initialisation des objets du jeu ===
+    ship = Ship((0, 0), settings.SHIP_SPRITES)
+    camera = Camera(ship.pos)
+    background = StarField()
+    flash = DamageFlash()
+    manager = GameManager()
+    minimap = MiniMapUI()
+
+    # États du jeu
     paused = False
     running = True
     high_score = 0
@@ -41,30 +65,27 @@ def main():
 
     # === Boucle principale ===
     while running:
-        dt = clock.tick(settings.FPS) / 1000  # deltaTime : temps entre deux frames
+        dt = clock.tick(settings.FPS) / 1000
 
-        # === Gestion des événements clavier/souris ===
+        # === Gestion des événements ===
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    paused = not paused  # Toggle pause
+                    paused = not paused
                 elif event.key == pygame.K_SPACE and not paused and not manager.game_over:
-                    manager.fire_laser(ship.pos, ship.forward())  # Tir laser
+                    manager.fire_laser(ship.pos, ship.forward())
 
             if manager.game_over and button_rect:
                 action = gameover_screen.handle_event(event, button_rect)
                 if action == "replay":
-                    manager.reset()
-                    ship.reset((0, 0))
-                    manager.game_over = False
-                    ship.has_shield = False 
+                    reset_game(ship, manager)
                     paused = False
-                    button_rect = False
+                    button_rect = None
 
-        # === Mise à jour logique ===
+        # === Mise à jour ===
         if not paused and not manager.game_over:
             keys = pygame.key.get_pressed()
             ship.update(keys)
@@ -72,41 +93,32 @@ def main():
             manager.update(ship, dt)
             flash.update(dt)
 
-        # === Rendu visuel ===
+        # === Dessin à l’écran ===
         screen.fill(settings.BACKGROUND_COLOR)
-
         offset = camera.get_offset((settings.WIDTH, settings.HEIGHT))
-
         background.draw(screen, camera.pos, (settings.WIDTH, settings.HEIGHT))
 
         # Dessin des entités
-        for laser in manager.lasers:
-            laser.draw(screen, offset)
-        for enemy in manager.enemies:
-            enemy.draw(screen, offset)
-        for repair in manager.repairs:
-            repair.draw(screen, offset)
-        for shield in manager.shield_pickups:  
-            shield.draw(screen, offset)
+        for entity_group in [manager.lasers, manager.enemies, manager.repairs, manager.shield_pickups]:
+            for entity in entity_group:
+                entity.draw(screen, offset)
 
         ship.draw(screen, offset)
         manager.flash.draw(screen)
 
-        # === UI ===
+        # UI
         minimap.draw(screen, ship.pos, manager.enemies, manager.repairs, manager.shield_pickups)
         hud.draw(screen, ship.speed, ship.health, manager.score)
 
         if paused:
             pause_screen.draw(screen)
-
-        if manager.game_over:
+        elif manager.game_over:
             if manager.score > high_score:
                 high_score = manager.score
             button_rect = gameover_screen.draw(screen, manager.score, high_score)
         else:
             button_rect = None
 
-        # Actualise l’écran
         pygame.display.flip()
 
     pygame.quit()
