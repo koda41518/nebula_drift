@@ -102,7 +102,6 @@ class GameManager:
         self.last_enemy_spawn = time.time()
         self.last_repair_spawn = time.time()
         self.last_shield_spawn = time.time() 
-        self.flash = DamageFlash()  #   réinitialise le flash
 
     def fire_laser(self, pos, direction):
         self.lasers.append(Laser(pos, direction))

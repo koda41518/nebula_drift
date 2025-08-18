@@ -52,6 +52,7 @@ class Ship:
         self.current_sprite = self.sprites["idle"]
         self.has_shield = False
         self.invincible_timer = 0
+        self.health = self.max_health
         
     def update(self, keys):
         if keys[pygame.K_LEFT]:
